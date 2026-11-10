@@ -2,6 +2,7 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import { Download, Share2 } from "lucide-react";
+import { domToPng } from "modern-screenshot";
 import { CertificatePreview } from "@/components/CertificatePreview";
 import { DIAGNOSES, SEVERITY_LABELS, shareCaption } from "@/lib/constants";
 import type { CertificateData, Diagnosis } from "@/lib/types";
@@ -50,16 +51,16 @@ export function SickNoteGenerator() {
     setDownloading(true);
     setDownloadError("");
     try {
-      const { default: html2canvas } = await import("html2canvas");
-      const canvas = await html2canvas(node, {
+      const dataUrl = await domToPng(node, {
         backgroundColor: "#0c1220",
         scale: 2,
       });
       const link = document.createElement("a");
-      link.href = canvas.toDataURL("image/png");
+      link.href = dataUrl;
       link.download = "leonida-sick-note.png";
       link.click();
-    } catch {
+    } catch (error) {
+      console.error(error);
       setDownloadError("Could not capture the note. Try again.");
     } finally {
       setDownloading(false);
